@@ -1,0 +1,666 @@
+
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .about-page {
+        --purple: #7062c5;
+        --dark: #292d43;
+        --muted: #777d90;
+        --line: #e9e8f2;
+
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 45px 30px 55px;
+        color: var(--dark);
+    }
+
+    .about-page * {
+        box-sizing: border-box;
+    }
+
+    /* ===== Split introduction ===== */
+    .about-intro {
+        display: grid;
+        grid-template-columns: 1.4fr .8fr;
+        gap: 35px;
+        align-items: center;
+    }
+
+    .intro-copy {
+        padding: 15px 0;
+    }
+
+    .intro-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 20px;
+        color: var(--purple);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.7px;
+        text-transform: uppercase;
+    }
+
+    .intro-label::before {
+        content: "";
+        width: 23px;
+        height: 2px;
+        background: var(--purple);
+    }
+
+    .intro-copy h1 {
+        max-width: 630px;
+        margin: 0 0 22px;
+        color: var(--dark);
+        font-size: clamp(32px, 4.4vw, 49px);
+        font-weight: 800;
+        letter-spacing: -1.3px;
+        line-height: 1.18;
+    }
+
+    .intro-copy h1 span {
+        color: var(--purple);
+    }
+
+    .intro-copy > p {
+        max-width: 610px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 2;
+    }
+
+    .intro-signature {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 27px;
+    }
+
+    .signature-mark {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 43px;
+        height: 43px;
+        border-radius: 13px;
+        background: #eeecff;
+        color: var(--purple);
+        font-size: 18px;
+    }
+
+    .signature-text strong {
+        display: block;
+        color: #41445b;
+        font-size: 12px;
+    }
+
+    .signature-text span {
+        display: block;
+        margin-top: 4px;
+        color: #888da0;
+        font-size: 11px;
+    }
+
+    /* ===== Purpose panel ===== */
+    .purpose-panel {
+        position: relative;
+        overflow: hidden;
+        min-height: 320px;
+        padding: 30px 26px;
+        border-radius: 20px;
+        color: white;
+        background: linear-gradient(150deg, #393453, #6556a7);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .purpose-panel::after {
+        content: "";
+        position: absolute;
+        width: 210px;
+        height: 210px;
+        right: -100px;
+        top: -90px;
+        border: 1px solid rgba(255,255,255,.15);
+        border-radius: 50%;
+        box-shadow:
+            0 0 0 22px rgba(255,255,255,.035),
+            0 0 0 45px rgba(255,255,255,.025);
+    }
+
+    .purpose-icon {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border: 1px solid rgba(255,255,255,.18);
+        border-radius: 14px;
+        background: rgba(255,255,255,.1);
+        color: white;
+        font-size: 21px;
+    }
+
+    .purpose-content {
+        position: relative;
+        z-index: 1;
+        margin-top: 35px;
+    }
+
+    .purpose-content .small-title {
+        display: block;
+        margin-bottom: 11px;
+        color: #d4ceff;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1.8px;
+    }
+
+    .purpose-content h2 {
+        margin: 0 0 14px;
+        color: white;
+        font-size: 25px;
+        font-weight: 800;
+        line-height: 1.35;
+    }
+
+    .purpose-content p {
+        margin: 0;
+        color: #e2def4;
+        font-size: 12px;
+        line-height: 1.9;
+    }
+
+    /* ===== Digital Twin concept ===== */
+    .concept-section {
+        display: grid;
+        grid-template-columns: .8fr 1.2fr;
+        gap: 45px;
+        align-items: center;
+        margin-top: 55px;
+        padding: 34px 0;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+    }
+
+    .concept-visual {
+        position: relative;
+        min-height: 245px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 18px;
+        background: #f1efff;
+    }
+
+    .concept-orbit {
+        position: absolute;
+        width: 185px;
+        height: 185px;
+        border: 1px dashed #c5bfef;
+        border-radius: 50%;
+    }
+
+    .concept-orbit.second {
+        width: 135px;
+        height: 135px;
+        border-style: solid;
+        border-color: #d8d3f7;
+    }
+
+    .concept-core {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 85px;
+        height: 85px;
+        border-radius: 25px;
+        background: linear-gradient(145deg, #8d7ee2, #6757b7);
+        color: white;
+        box-shadow: 0 12px 28px #6255b333;
+        font-size: 35px;
+    }
+
+    .orbit-node {
+        position: absolute;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 39px;
+        height: 39px;
+        border: 1px solid #e8e4fb;
+        border-radius: 12px;
+        background: #fff;
+        color: #7062c5;
+        box-shadow: 0 5px 14px #292d4310;
+        font-size: 15px;
+    }
+
+    .node-top {
+        top: 30px;
+        left: calc(50% - 19px);
+    }
+
+    .node-left {
+        left: 14%;
+        top: calc(50% - 19px);
+    }
+
+    .node-right {
+        right: 14%;
+        top: calc(50% - 19px);
+    }
+
+    .node-bottom {
+        bottom: 26px;
+        left: calc(50% - 19px);
+    }
+
+    .concept-copy .eyebrow {
+        display: block;
+        margin-bottom: 12px;
+        color: var(--purple);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1.6px;
+    }
+
+    .concept-copy h2 {
+        margin: 0 0 15px;
+        color: var(--dark);
+        font-size: 27px;
+        font-weight: 800;
+        line-height: 1.35;
+    }
+
+    .concept-copy p {
+        margin: 0 0 13px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.95;
+    }
+
+    .concept-emphasis {
+        padding-left: 14px;
+        border-left: 3px solid #8173d5;
+        color: #555875;
+        font-size: 12px;
+        line-height: 1.9;
+    }
+
+    /* ===== Areas supported by the platform ===== */
+    .areas-section {
+        margin-top: 49px;
+    }
+
+    .areas-heading {
+        max-width: 680px;
+        margin-bottom: 23px;
+    }
+
+    .areas-heading .eyebrow {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--purple);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1.7px;
+    }
+
+    .areas-heading h2 {
+        margin: 0 0 10px;
+        color: var(--dark);
+        font-size: 27px;
+        font-weight: 800;
+    }
+
+    .areas-heading p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.8;
+    }
+
+    .areas-list {
+        border-top: 1px solid var(--line);
+    }
+
+    .area-row {
+        display: grid;
+        grid-template-columns: 45px 190px 1fr;
+        gap: 16px;
+        align-items: center;
+        padding: 19px 5px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .area-number {
+        color: #9488d8;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .area-row h3 {
+        margin: 0;
+        color: #3d4157;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .area-row p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    /* ===== Closing statement ===== */
+    .closing-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        margin-top: 30px;
+        padding: 20px;
+        border: 1px solid #e9e5fa;
+        border-radius: 12px;
+        background: #faf9ff;
+    }
+
+    .closing-note i {
+        margin-top: 3px;
+        color: var(--purple);
+        font-size: 17px;
+    }
+
+    .closing-note p {
+        margin: 0;
+        color: #666b80;
+        font-size: 12px;
+        line-height: 1.9;
+    }
+
+    /* ===== Mobile responsive ===== */
+    @media (max-width: 800px) {
+        .about-page {
+            padding: 32px 20px 45px;
+        }
+
+        .about-intro {
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .purpose-panel {
+            min-height: 270px;
+        }
+
+        .concept-section {
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin-top: 35px;
+        }
+
+        .concept-visual {
+            min-height: 230px;
+        }
+
+        .area-row {
+            grid-template-columns: 32px 1fr;
+            gap: 10px;
+        }
+
+        .area-row p {
+            grid-column: 2;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .about-page {
+            padding: 25px 15px 35px;
+        }
+
+        .intro-copy h1 {
+            font-size: 34px;
+        }
+
+        .purpose-content h2,
+        .concept-copy h2,
+        .areas-heading h2 {
+            font-size: 24px;
+        }
+
+        .purpose-panel {
+            padding: 25px 22px;
+        }
+
+        .concept-visual {
+            min-height: 210px;
+        }
+
+        .concept-orbit {
+            width: 160px;
+            height: 160px;
+        }
+
+        .concept-orbit.second {
+            width: 118px;
+            height: 118px;
+        }
+
+        .area-row {
+            padding: 17px 0;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="about-page">
+
+    <!-- Main introduction -->
+    <section class="about-intro">
+
+        <div class="intro-copy">
+            <span class="intro-label">ABOUT THE PLATFORM</span>
+
+            <h1>
+                Turn everyday data into
+                <span>smarter decisions.</span>
+            </h1>
+
+            <p>
+                Visual Risk and AI Intelligence brings together your
+                financial activities, study patterns, fitness routines,
+                and personal goals in one intelligent platform.
+                It uses predictive analytics and AI-assisted insights
+                to help you understand your progress and explore
+                possible future outcomes.
+            </p>
+
+            <div class="intro-signature">
+                <div class="signature-mark">
+                    <i class="fas fa-brain"></i>
+                </div>
+
+                <div class="signature-text">
+                    <strong>Powered by intelligent analytics</strong>
+                    <span>Personal insights. Better planning.</span>
+                </div>
+            </div>
+        </div>
+
+
+        <aside class="purpose-panel">
+            <div class="purpose-icon">
+                <i class="fas fa-compass"></i>
+            </div>
+
+            <div class="purpose-content">
+                <span class="small-title">OUR PURPOSE</span>
+
+                <h2>See the bigger picture of your life.</h2>
+
+                <p>
+                    Life decisions rarely happen in isolation.
+                    Our goal is to help you understand your
+                    activities, consider different possibilities,
+                    and make more informed choices.
+                </p>
+            </div>
+        </aside>
+
+    </section>
+
+
+    <!-- Digital Twin concept -->
+    <section class="concept-section">
+
+        <div class="concept-visual" aria-label="Digital Twin concept illustration">
+
+            <div class="concept-orbit"></div>
+            <div class="concept-orbit second"></div>
+
+            <div class="concept-core">
+                <i class="fas fa-brain"></i>
+            </div>
+
+            <div class="orbit-node node-top">
+                <i class="fas fa-chart-line"></i>
+            </div>
+
+            <div class="orbit-node node-left">
+                <i class="fas fa-wallet"></i>
+            </div>
+
+            <div class="orbit-node node-right">
+                <i class="fas fa-book-open"></i>
+            </div>
+
+            <div class="orbit-node node-bottom">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+
+        </div>
+
+
+        <div class="concept-copy">
+            <span class="eyebrow">THE DIGITAL TWIN CONCEPT</span>
+
+            <h2>A digital reflection of your everyday life.</h2>
+
+            <p>
+                A Digital Twin is a digital representation of selected
+                aspects of your activities. Here, financial records,
+                study sessions, fitness information, and personal
+                goals help build a more connected view of your progress.
+            </p>
+
+            <p>
+                The platform uses available information to show
+                patterns, estimate trends, and explore what-if
+                scenarios across different areas of life.
+            </p>
+
+            <div class="concept-emphasis">
+                Understand what's happening today, learn from
+                previous activity, and explore what could happen next.
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- Platform areas -->
+    <section class="areas-section">
+
+        <div class="areas-heading">
+            <span class="eyebrow">ONE CONNECTED EXPERIENCE</span>
+
+            <h2>Designed around your everyday priorities.</h2>
+
+            <p>
+                The platform brings several personal management
+                and decision-support tools together rather than
+                treating each area separately.
+            </p>
+        </div>
+
+
+        <div class="areas-list">
+
+            <article class="area-row">
+                <span class="area-number">01</span>
+                <h3>Financial wellbeing</h3>
+                <p>
+                    Review income, expenses, savings patterns,
+                    and estimated future financial trends.
+                </p>
+            </article>
+
+            <article class="area-row">
+                <span class="area-number">02</span>
+                <h3>Academic growth</h3>
+                <p>
+                    Track study sessions, productivity, subjects,
+                    and available academic performance predictions.
+                </p>
+            </article>
+
+            <article class="area-row">
+                <span class="area-number">03</span>
+                <h3>Fitness and activity</h3>
+                <p>
+                    Record activity duration, calories, weekly
+                    targets, and fitness trends.
+                </p>
+            </article>
+
+            <article class="area-row">
+                <span class="area-number">04</span>
+                <h3>Goals and simulations</h3>
+                <p>
+                    Monitor personal goals and compare possible
+                    outcomes through what-if scenarios.
+                </p>
+            </article>
+
+            <article class="area-row">
+                <span class="area-number">05</span>
+                <h3>AI-assisted guidance</h3>
+                <p>
+                    Explore personalised questions and recommendations
+                    through the configured AI assistant.
+                </p>
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- Closing statement -->
+    <div class="closing-note">
+        <i class="fas fa-lightbulb"></i>
+
+        <p>
+            <strong>Our approach:</strong> Data and AI can help
+            people explore possibilities, but predictions are
+            estimates rather than guarantees. The platform is
+            intended to support thoughtful decisions, not replace
+            personal judgement.
+        </p>
+    </div>
+
+</div>
+{% endblock %}
