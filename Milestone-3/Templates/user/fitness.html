@@ -1,0 +1,1163 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --fitness-blue: #2878E8;
+        --fitness-indigo: #667EEA;
+        --fitness-purple: #764BA2;
+        --fitness-bg: #EEF3FF;
+        --fitness-ink: #293449;
+        --fitness-text: #4D5870;
+        --fitness-muted: #7B8498;
+        --fitness-line: #E3EAF6;
+    }
+
+    .fitness-page {
+        min-height: 75vh;
+        padding: 22px 16px 48px;
+        background: #EEF3FF;
+        color: var(--fitness-ink);
+    }
+
+    .fitness-wrap {
+        width: min(1550px, 100%);
+        margin: 0 auto;
+    }
+
+    .fitness-heading-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .fitness-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+        color: #30394B;
+        font-size: clamp(1.45rem, 2.8vw, 2rem);
+        font-weight: 800;
+        letter-spacing: -.03em;
+    }
+
+    .fitness-title-icon {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: 14px;
+        color: white;
+        background: #2878E8;
+        box-shadow: 0 8px 20px rgba(40,120,232,.20);
+    }
+
+    .fitness-updated {
+        color: #58647A;
+        font-size: .8rem;
+        font-weight: 600;
+    }
+
+    /* Summary cards */
+    .fitness-metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .fitness-metric {
+        min-height: 124px;
+        position: relative;
+        overflow: hidden;
+        padding: 18px 20px;
+        border-radius: 17px;
+        color: #263449;
+        box-shadow: 0 7px 18px rgba(41,52,73,.07);
+    }
+
+    .fitness-metric:nth-child(1) {
+        background: linear-gradient(135deg, #43B87D, #329F6C);
+    }
+
+    .fitness-metric:nth-child(2) {
+        background: linear-gradient(135deg, #FF7777, #EB3738);
+    }
+
+    .fitness-metric:nth-child(3) {
+        background: linear-gradient(135deg, #4398DF, #2769AC);
+    }
+
+    .fitness-metric:nth-child(4) {
+        background: linear-gradient(135deg, #E85BA8, #D63384);
+    }
+
+    .fitness-metric::after {
+        content: "";
+        position: absolute;
+        width: 125px;
+        height: 125px;
+        right: -40px;
+        top: -48px;
+        border: 1px solid rgba(255,255,255,.22);
+        border-radius: 50%;
+        box-shadow: 0 0 0 18px rgba(255,255,255,.035);
+        pointer-events: none;
+    }
+
+    .fitness-metric-top {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        color: rgba(35,43,60,.86);
+        font-size: .86rem;
+        font-weight: 600;
+    }
+
+    .fitness-metric-top i {
+        font-size: 1.55rem;
+        opacity: .78;
+    }
+
+    .fitness-metric-value {
+        position: relative;
+        z-index: 1;
+        margin: 6px 0 4px;
+        color: #263449;
+        font-size: clamp(1.4rem, 2vw, 1.85rem);
+        line-height: 1.15;
+        font-weight: 800;
+        letter-spacing: -.025em;
+        overflow-wrap: anywhere;
+    }
+
+    .fitness-metric small {
+        position: relative;
+        z-index: 1;
+        color: rgba(35,43,60,.78);
+        font-size: .75rem;
+    }
+
+    /* Main layout */
+    .fitness-main-grid {
+        display: grid;
+        grid-template-columns: minmax(285px, .9fr) minmax(0, 1.8fr);
+        gap: 16px;
+        align-items: start;
+    }
+
+    .fitness-left-column,
+    .fitness-right-column {
+        display: grid;
+        gap: 16px;
+        min-width: 0;
+    }
+
+    .fitness-card {
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid #E3EAF6;
+        border-radius: 18px;
+        background: #FFFFFF;
+        box-shadow: 0 7px 22px rgba(45,57,81,.045);
+    }
+
+    .fitness-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 17px 20px;
+        border-bottom: 1px solid #EAF0FA;
+        background: #FFFFFF;
+    }
+
+    .fitness-card-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+        color: #30394B;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .fitness-card-title i {
+        color: #2878E8;
+    }
+
+    .fitness-card-body {
+        padding: 19px 20px 21px;
+    }
+
+    .fitness-count {
+        padding: 5px 9px;
+        border-radius: 8px;
+        color: #40526C;
+        background: #EAF0FA;
+        font-size: .74rem;
+        font-weight: 800;
+    }
+
+    /* Add activity form */
+    .fitness-form .form-label {
+        display: block;
+        margin-bottom: 7px;
+        color: #30394B;
+        font-size: .84rem;
+        font-weight: 700;
+    }
+
+    .fitness-form .form-control,
+    .fitness-form .form-select {
+        min-height: 43px;
+        border: 1px solid #E1EAF7;
+        border-radius: 11px;
+        color: #354258;
+        background-color: #FFFFFF;
+        font-size: .91rem;
+        box-shadow: none;
+    }
+
+    .fitness-form .form-control:focus,
+    .fitness-form .form-select:focus {
+        border-color: #667EEA;
+        box-shadow: 0 0 0 3px rgba(102,126,234,.12);
+    }
+
+    .fitness-form .mb-3 {
+        margin-bottom: 15px !important;
+    }
+
+    .fitness-submit {
+        width: 100%;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        border: 0;
+        border-radius: 999px;
+        color: #FFFFFF;
+        background: linear-gradient(135deg, #667EEA, #764BA2);
+        font-size: .9rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform .2s ease, box-shadow .2s ease;
+        box-shadow: 0 8px 18px rgba(102,126,234,.20);
+    }
+
+    .fitness-submit:hover {
+        color: #FFFFFF;
+        background: linear-gradient(135deg, #596FE0, #68408F);
+        transform: translateY(-1px);
+        box-shadow: 0 11px 22px rgba(102,126,234,.25);
+    }
+
+    /* Weekly progress */
+    .fitness-progress-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 13px;
+    }
+
+    .fitness-progress-top strong {
+        color: #30394B;
+        font-size: .95rem;
+    }
+
+    .fitness-progress-top span {
+        color: #526DDA;
+        font-weight: 800;
+        font-size: 1.05rem;
+    }
+
+    .fitness-progress-track {
+        height: 10px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #EAF0FA;
+    }
+
+    .fitness-progress-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(135deg, #667EEA, #764BA2);
+        transition: width .3s ease;
+    }
+
+    .fitness-progress-note {
+        color: #717D92;
+        margin: 10px 0 0;
+        font-size: .82rem;
+        line-height: 1.65;
+    }
+
+    .fitness-goal-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin-top: 15px;
+        padding: 8px 11px;
+        border-radius: 10px;
+        color: #4157A3;
+        background: #ECF0FF;
+        font-size: .78rem;
+        font-weight: 700;
+    }
+
+    /* Activity table */
+    .fitness-table-wrap {
+        overflow-x: auto;
+    }
+
+    .fitness-table {
+        width: 100%;
+        margin: 0;
+        border-collapse: collapse;
+        white-space: nowrap;
+    }
+
+    .fitness-table thead th {
+        padding: 13px 15px;
+        background: #FFFFFF;
+        color: #77849A;
+        border-bottom: 1px solid #E4EAF4;
+        text-align: left;
+        font-size: .72rem;
+        font-weight: 800;
+        letter-spacing: .045em;
+        text-transform: uppercase;
+    }
+
+    .fitness-table tbody td {
+        padding: 13px 15px;
+        color: #354258;
+        border-bottom: 1px solid #E7ECF5;
+        font-size: .85rem;
+        vertical-align: middle;
+    }
+
+    .fitness-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .fitness-table tbody tr:hover {
+        background: #F5F7FC;
+    }
+
+    .fitness-activity-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 9px;
+        border-radius: 8px;
+        color: #4256A0;
+        background: #ECF0FF;
+        font-size: .75rem;
+        font-weight: 800;
+    }
+
+    .fitness-duration-text {
+        color: #344C7E !important;
+        font-weight: 800;
+    }
+
+    .fitness-calories-text {
+        color: #B34C64 !important;
+        font-weight: 800;
+    }
+
+    .fitness-action-btn {
+        display: inline-grid;
+        place-items: center;
+        width: 31px;
+        height: 31px;
+        border: 1px solid #6B83FF;
+        border-radius: 8px;
+        color: #5D78F0;
+        background: #FFFFFF;
+        cursor: pointer;
+        transition: background .2s ease, color .2s ease;
+    }
+
+    .fitness-action-btn:hover {
+        color: #FFFFFF;
+        background: #667EEA;
+    }
+
+    .fitness-delete-btn {
+        color: #F04452;
+        border-color: #FF6570;
+    }
+
+    .fitness-delete-btn:hover {
+        color: #FFFFFF;
+        background: #F04452;
+    }
+
+    .fitness-empty {
+        padding: 28px 18px;
+        text-align: center;
+        color: #818BA0;
+    }
+
+    .fitness-empty-icon {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 10px;
+        border-radius: 13px;
+        background: #EEF2FF;
+        color: #667EEA;
+        font-size: 1.15rem;
+    }
+
+    .fitness-empty strong {
+        display: block;
+        color: #59657A;
+        font-size: .9rem;
+        margin-bottom: 4px;
+    }
+
+    .fitness-empty p {
+        margin: 0;
+        font-size: .82rem;
+        line-height: 1.65;
+    }
+
+    /* Charts */
+    .fitness-chart-body {
+        min-height: 180px;
+        padding: 20px;
+    }
+
+    .fitness-chart-area {
+        position: relative;
+        width: 100%;
+        height: 235px;
+    }
+
+    .fitness-chart-area canvas {
+        max-width: 100%;
+        max-height: 235px;
+    }
+
+    .fitness-chart-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .fitness-chart-grid .fitness-chart-area {
+        height: 220px;
+    }
+
+    .fitness-chart-grid .fitness-chart-area canvas {
+        max-height: 220px;
+    }
+
+    /* Responsive design */
+    @media (max-width: 1050px) {
+        .fitness-metrics {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .fitness-main-grid {
+            grid-template-columns: minmax(250px, .8fr) minmax(0, 1.2fr);
+        }
+    }
+
+    @media (max-width: 760px) {
+        .fitness-page {
+            padding: 18px 11px 38px;
+        }
+
+        .fitness-main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .fitness-heading-row {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .fitness-chart-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 440px) {
+        .fitness-metrics {
+            gap: 9px;
+        }
+
+        .fitness-metric {
+            padding: 14px;
+            min-height: 104px;
+            border-radius: 14px;
+        }
+
+        .fitness-metric-top {
+            font-size: .75rem;
+        }
+
+        .fitness-metric-value {
+            font-size: 1.35rem;
+        }
+
+        .fitness-card-header {
+            padding: 14px;
+        }
+
+        .fitness-card-body {
+            padding: 15px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="fitness-page">
+    <div class="fitness-wrap">
+
+        <!-- PAGE HEADING -->
+        <div class="fitness-heading-row">
+            <h1 class="fitness-title">
+                <span class="fitness-title-icon">
+                    <i class="fas fa-dumbbell"></i>
+                </span>
+                Fitness Management
+            </h1>
+
+            <div class="fitness-updated">
+                <i class="far fa-heart me-1"></i>
+                Build healthy habits, one activity at a time
+            </div>
+        </div>
+
+        <!-- SUMMARY METRICS -->
+        <section class="fitness-metrics" aria-label="Fitness summary">
+
+            <div class="fitness-metric">
+                <div class="fitness-metric-top">
+                    <span>Total Active Minutes</span>
+                    <i class="fas fa-stopwatch"></i>
+                </div>
+                <div class="fitness-metric-value">{{ total_min }} min</div>
+                <small>All recorded activities</small>
+            </div>
+
+            <div class="fitness-metric">
+                <div class="fitness-metric-top">
+                    <span>Calories Burned</span>
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div class="fitness-metric-value">{{ total_cal }} kcal</div>
+                <small>Total recorded calories</small>
+            </div>
+
+            <div class="fitness-metric">
+                <div class="fitness-metric-top">
+                    <span>This Week</span>
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="fitness-metric-value">{{ weekly_min }} min</div>
+                <small>Activity this week</small>
+            </div>
+
+            <div class="fitness-metric">
+                <div class="fitness-metric-top">
+                    <span>Activity Streak</span>
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="fitness-metric-value">{{ streak }} days</div>
+                <small>Consecutive active days</small>
+            </div>
+
+        </section>
+
+        <div class="fitness-main-grid">
+
+            <!-- LEFT COLUMN -->
+            <div class="fitness-left-column">
+
+                <!-- ADD ACTIVITY FORM -->
+                <section class="fitness-card">
+                    <div class="fitness-card-header">
+                        <h2 class="fitness-card-title">
+                            <i class="fas fa-plus-circle"></i>
+                            Add Fitness Activity
+                        </h2>
+                    </div>
+
+                    <div class="fitness-card-body">
+                        <form class="fitness-form"
+                              method="POST"
+                              action="{{ url_for('user_fitness') }}">
+
+                            <div class="mb-3">
+                                <label class="form-label" for="fitnessDate">
+                                    Date
+                                </label>
+
+                                <input type="date"
+                                       class="form-control"
+                                       id="fitnessDate"
+                                       name="date"
+                                       value="{{ datetime.now().strftime('%Y-%m-%d') }}"
+                                       required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="fitnessActivity">
+                                    Activity
+                                </label>
+
+                                <select class="form-select"
+                                        id="fitnessActivity"
+                                        name="activity"
+                                        required>
+                                    <option value="Walking">Walking</option>
+                                    <option value="Running">Running</option>
+                                    <option value="Cycling">Cycling</option>
+                                    <option value="Yoga">Yoga</option>
+                                    <option value="Gym Workout">Gym Workout</option>
+                                    <option value="Strength Training">Strength Training</option>
+                                    <option value="Swimming">Swimming</option>
+                                    <option value="Dancing">Dancing</option>
+                                    <option value="Sports">Sports</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="fitnessDuration">
+                                    Duration (minutes)
+                                </label>
+
+                                <input type="number"
+                                       class="form-control"
+                                       id="fitnessDuration"
+                                       name="duration"
+                                       min="1"
+                                       max="1440"
+                                       step="1"
+                                       placeholder="e.g. 30"
+                                       required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="fitnessCalories">
+                                    Calories Burned (kcal)
+                                </label>
+
+                                <input type="number"
+                                       class="form-control"
+                                       id="fitnessCalories"
+                                       name="calories"
+                                       min="0"
+                                       max="10000"
+                                       step="1"
+                                       placeholder="e.g. 150"
+                                       required>
+                            </div>
+
+                            <button type="submit" class="fitness-submit">
+                                <i class="fas fa-save"></i>
+                                Save Fitness Activity
+                            </button>
+
+                        </form>
+                    </div>
+                </section>
+
+                <!-- WEEKLY GOAL -->
+                <section class="fitness-card">
+                    <div class="fitness-card-header">
+                        <h2 class="fitness-card-title">
+                            <i class="fas fa-bullseye"></i>
+                            Weekly Activity Goal
+                        </h2>
+                    </div>
+
+                    <div class="fitness-card-body">
+                        <div class="fitness-progress-top">
+                            <strong>150 minutes per week</strong>
+                            <span>{{ week_progress|round(1) }}%</span>
+                        </div>
+
+                        <div class="fitness-progress-track">
+                            <div class="fitness-progress-fill"
+                                 style="width: {{ [[week_progress, 100]|min, 0]|max }}%;">
+                            </div>
+                        </div>
+
+                        <p class="fitness-progress-note">
+                            {% if weekly_min >= 150 %}
+                                Great work! You have reached your weekly activity goal.
+                            {% else %}
+                                You have completed {{ weekly_min }} minutes.
+                                Keep moving toward your weekly target.
+                            {% endif %}
+                        </p>
+
+                        <span class="fitness-goal-chip">
+                            <i class="fas fa-heartbeat"></i>
+                            Consistency matters
+                        </span>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="fitness-right-column">
+
+                <!-- RECENT ACTIVITIES -->
+                <section class="fitness-card">
+                    <div class="fitness-card-header">
+                        <h2 class="fitness-card-title">
+                            <i class="fas fa-list-ul"></i>
+                            Recent Fitness Activities
+                        </h2>
+
+                        <span class="fitness-count">
+                            {{ logs|length }} entries
+                        </span>
+                    </div>
+
+                    {% if logs %}
+                    <div class="fitness-table-wrap">
+                        <table class="fitness-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Activity</th>
+                                    <th>Duration</th>
+                                    <th>Calories</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.date.strftime('%d-%m-%Y') }}</td>
+
+                                    <td>
+                                        <span class="fitness-activity-badge">
+                                            {{ log.activity or 'Activity' }}
+                                        </span>
+                                    </td>
+
+                                    <td class="fitness-duration-text">
+                                        {{ log.duration_min }} min
+                                    </td>
+
+                                    <td class="fitness-calories-text">
+                                        {{ log.calories_burned }} kcal
+                                    </td>
+
+                                    <td>
+                                        <!-- EDIT BUTTON -->
+                                        <button type="button"
+                                                class="fitness-action-btn me-1"
+                                                title="Edit activity"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editFitnessModal"
+                                                data-id="{{ log.id }}"
+                                                data-edit-url="{{ url_for('edit_fitness', log_id=log.id) }}"
+                                                data-date="{{ log.date.strftime('%Y-%m-%d') }}"
+                                                data-activity="{{ log.activity or '' }}"
+                                                data-duration="{{ log.duration_min }}"
+                                                data-calories="{{ log.calories_burned }}">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+
+                                        <!-- DELETE BUTTON -->
+                                        <form method="POST"
+                                              action="{{ url_for('delete_fitness', log_id=log.id) }}"
+                                              style="display:inline;"
+                                              onsubmit="return confirm('Delete this fitness activity?');">
+
+                                            <button type="submit"
+                                                    class="fitness-action-btn fitness-delete-btn"
+                                                    title="Delete activity">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% else %}
+                    <div class="fitness-empty">
+                        <div class="fitness-empty-icon">
+                            <i class="fas fa-person-walking"></i>
+                        </div>
+
+                        <strong>No fitness activities yet</strong>
+                        <p>Add your first activity to start tracking your progress.</p>
+                    </div>
+                    {% endif %}
+                </section>
+
+                <!-- DAILY ACTIVITY CHART -->
+                <section class="fitness-card">
+                    <div class="fitness-card-header">
+                        <h2 class="fitness-card-title">
+                            <i class="fas fa-chart-line"></i>
+                            Daily Activity Trend
+                        </h2>
+                    </div>
+
+                    <div class="fitness-chart-body">
+                        {% if logs %}
+                        <div class="fitness-chart-area">
+                            <canvas id="fitnessDailyChart"></canvas>
+                        </div>
+                        {% else %}
+                        <div class="fitness-empty">
+                            <div class="fitness-empty-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+
+                            <strong>Your activity trend will appear here</strong>
+                            <p>Record a fitness activity to start building your chart.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <!-- ACTIVITY BREAKDOWN -->
+                <section class="fitness-card">
+                    <div class="fitness-card-header">
+                        <h2 class="fitness-card-title">
+                            <i class="fas fa-chart-pie"></i>
+                            Activity Breakdown
+                        </h2>
+                    </div>
+
+                    <div class="fitness-chart-body">
+                        {% if activities %}
+                        <div class="fitness-chart-area">
+                            <canvas id="fitnessActivityChart"></canvas>
+                        </div>
+                        {% else %}
+                        <div class="fitness-empty">
+                            <div class="fitness-empty-icon">
+                                <i class="fas fa-dumbbell"></i>
+                            </div>
+
+                            <strong>No activity data yet</strong>
+                            <p>Add multiple activity types to see your breakdown.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- EDIT ACTIVITY MODAL -->
+<div class="modal fade"
+     id="editFitnessModal"
+     tabindex="-1"
+     aria-labelledby="editFitnessModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content"
+             style="border:0;border-radius:20px;overflow:hidden;">
+
+            <form method="POST" id="editFitnessForm">
+
+                <div class="modal-header"
+                     style="background:#F4F6FD;border-bottom:1px solid #E3EAF6;">
+
+                    <h5 class="modal-title fw-bold"
+                        id="editFitnessModalLabel"
+                        style="color:#30394B;">
+                        <i class="fas fa-pen me-2"
+                           style="color:#2878E8;"></i>
+                        Edit Fitness Activity
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+                </div>
+
+                <div class="modal-body p-4">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="editFitnessDate">
+                            Date
+                        </label>
+
+                        <input type="date"
+                               class="form-control"
+                               name="date"
+                               id="editFitnessDate"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="editFitnessActivity">
+                            Activity
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               name="activity"
+                               id="editFitnessActivity"
+                               maxlength="50"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="editFitnessDuration">
+                            Duration (minutes)
+                        </label>
+
+                        <input type="number"
+                               class="form-control"
+                               name="duration"
+                               id="editFitnessDuration"
+                               min="1"
+                               max="1440"
+                               step="1"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="editFitnessCalories">
+                            Calories Burned (kcal)
+                        </label>
+
+                        <input type="number"
+                               class="form-control"
+                               name="calories"
+                               id="editFitnessCalories"
+                               min="0"
+                               max="10000"
+                               step="1"
+                               required>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer"
+                     style="border-top:1px solid #E3EAF6;">
+
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn text-white"
+                            style="background:linear-gradient(135deg,#667EEA,#764BA2);border:0;border-radius:10px;">
+                        <i class="fas fa-save me-1"></i>
+                        Save Changes
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* Fill the edit modal from the selected row */
+    const editModal = document.getElementById('editFitnessModal');
+    const editForm = document.getElementById('editFitnessForm');
+
+    if (editModal && editForm) {
+        editModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+
+            if (!button) return;
+
+            editForm.action = button.getAttribute('data-edit-url');
+
+            document.getElementById('editFitnessDate').value =
+                button.getAttribute('data-date');
+
+            document.getElementById('editFitnessActivity').value =
+                button.getAttribute('data-activity');
+
+            document.getElementById('editFitnessDuration').value =
+                button.getAttribute('data-duration');
+
+            document.getElementById('editFitnessCalories').value =
+                button.getAttribute('data-calories');
+        });
+    }
+
+    /* Stop chart initialization if Chart.js is unavailable */
+    if (typeof Chart === 'undefined') return;
+
+    const chartBlue = '#667EEA';
+    const chartPurple = '#764BA2';
+    const chartFill = 'rgba(102,126,234,0.12)';
+    const chartMuted = '#77849A';
+    const chartGrid = '#E5EAF4';
+
+    const palette = [
+        '#667EEA',
+        '#764BA2',
+        '#4398DF',
+        '#43B87D',
+        '#E85BA8',
+        '#A49BE0',
+        '#5B79C7',
+        '#D63384'
+    ];
+
+    /* Daily activity trend */
+    const dailyCanvas = document.getElementById('fitnessDailyChart');
+
+    if (dailyCanvas) {
+        const dates = {{ dates|tojson }};
+        const dailyData = {{ daily_data|tojson }};
+
+        new Chart(dailyCanvas, {
+            type: 'line',
+
+            data: {
+                labels: dates,
+
+                datasets: [{
+                    label: 'Active minutes',
+                    data: dailyData,
+                    borderColor: chartBlue,
+                    backgroundColor: chartFill,
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 3,
+                    pointRadius: 3,
+                    pointBackgroundColor: chartBlue
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: chartMuted,
+                            usePointStyle: true
+                        }
+                    }
+                },
+
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+
+                        ticks: {
+                            color: chartMuted,
+                            maxRotation: 45
+                        }
+                    },
+
+                    y: {
+                        beginAtZero: true,
+
+                        grid: {
+                            color: chartGrid
+                        },
+
+                        ticks: {
+                            color: chartMuted
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /* Activity type breakdown */
+    const activityCanvas = document.getElementById('fitnessActivityChart');
+
+    if (activityCanvas) {
+        const activities = {{ activities|tojson }};
+        const activityMinutes = {{ activity_minutes|tojson }};
+
+        new Chart(activityCanvas, {
+            type: 'doughnut',
+
+            data: {
+                labels: activities,
+
+                datasets: [{
+                    data: activityMinutes,
+
+                    backgroundColor: activities.map(
+                        (_, index) => palette[index % palette.length]
+                    ),
+
+                    borderColor: '#FFFFFF',
+                    borderWidth: 3,
+                    hoverOffset: 5
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+
+                        labels: {
+                            color: chartMuted,
+                            padding: 12,
+                            usePointStyle: true,
+                            boxWidth: 9
+                        }
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' +
+                                    context.parsed + ' minutes';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
