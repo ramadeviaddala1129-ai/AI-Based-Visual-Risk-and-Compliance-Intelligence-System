@@ -1,0 +1,1461 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --study-blue: #2878E8;
+        --study-indigo: #667EEA;
+        --study-purple: #764BA2;
+        --study-bg: #EEF3FF;
+        --study-ink: #293449;
+        --study-text: #4D5870;
+        --study-muted: #7B8498;
+        --study-line: #E3EAF6;
+    }
+
+    .study-page {
+        min-height: 75vh;
+        padding: 22px 16px 48px;
+        background: #EEF3FF;
+        color: var(--study-ink);
+    }
+
+    .study-wrap {
+        width: min(1550px, 100%);
+        margin: 0 auto;
+    }
+
+    .study-heading-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .study-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+        color: #30394B;
+        font-size: clamp(1.45rem, 2.8vw, 2rem);
+        font-weight: 800;
+        letter-spacing: -.03em;
+    }
+
+    .study-title-icon {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: 14px;
+        color: #fff;
+        background: #2878E8;
+        box-shadow: 0 8px 20px rgba(40,120,232,.20);
+    }
+
+    .study-updated {
+        color: #58647A;
+        font-size: .8rem;
+        font-weight: 600;
+    }
+
+    /* Summary cards */
+    .study-metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .study-metric {
+        min-height: 124px;
+        position: relative;
+        overflow: hidden;
+        padding: 18px 20px;
+        border-radius: 17px;
+        color: #263449;
+        box-shadow: 0 7px 18px rgba(41,52,73,.07);
+    }
+
+    .study-metric:nth-child(1) {
+        background: linear-gradient(135deg, #43B87D, #329F6C);
+    }
+
+    .study-metric:nth-child(2) {
+        background: linear-gradient(135deg, #FF7777, #EB3738);
+    }
+
+    .study-metric:nth-child(3) {
+        background: linear-gradient(135deg, #4398DF, #2769AC);
+    }
+
+    .study-metric:nth-child(4) {
+        background: linear-gradient(135deg, #E85BA8, #D63384);
+    }
+
+    .study-metric::after {
+        content: "";
+        position: absolute;
+        width: 125px;
+        height: 125px;
+        right: -40px;
+        top: -48px;
+        border: 1px solid rgba(255,255,255,.22);
+        border-radius: 50%;
+        box-shadow: 0 0 0 18px rgba(255,255,255,.035);
+        pointer-events: none;
+    }
+
+    .study-metric-top {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        color: rgba(35,43,60,.86);
+        font-size: .86rem;
+        font-weight: 600;
+    }
+
+    .study-metric-top i {
+        font-size: 1.55rem;
+        opacity: .78;
+    }
+
+    .study-metric-value {
+        position: relative;
+        z-index: 1;
+        margin: 6px 0 4px;
+        color: #263449;
+        font-size: clamp(1.4rem, 2vw, 1.85rem);
+        line-height: 1.15;
+        font-weight: 800;
+        letter-spacing: -.025em;
+        overflow-wrap: anywhere;
+    }
+
+    .study-metric small {
+        position: relative;
+        z-index: 1;
+        color: rgba(35,43,60,.78);
+        font-size: .75rem;
+    }
+
+    /* Main layout */
+    .study-main-grid {
+        display: grid;
+        grid-template-columns: minmax(285px, .9fr) minmax(0, 1.8fr);
+        gap: 16px;
+        align-items: start;
+    }
+
+    .study-left-column,
+    .study-right-column {
+        display: grid;
+        gap: 16px;
+        min-width: 0;
+    }
+
+    /* Common cards */
+    .study-card {
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid #E3EAF6;
+        border-radius: 18px;
+        background: #FFFFFF;
+        box-shadow: 0 7px 22px rgba(45,57,81,.045);
+    }
+
+    .study-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 17px 20px;
+        border-bottom: 1px solid #EAF0FA;
+        background: #FFFFFF;
+    }
+
+    .study-card-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+        color: #30394B;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .study-card-title i {
+        color: #2878E8;
+    }
+
+    .study-card-body {
+        padding: 19px 20px 21px;
+    }
+
+    .study-count {
+        padding: 5px 9px;
+        border-radius: 8px;
+        color: #40526C;
+        background: #EAF0FA;
+        font-size: .74rem;
+        font-weight: 800;
+    }
+
+    /* Study form */
+    .study-form .form-label {
+        display: block;
+        margin-bottom: 7px;
+        color: #30394B;
+        font-size: .84rem;
+        font-weight: 700;
+    }
+
+    .study-form .form-control,
+    .study-form .form-select {
+        min-height: 43px;
+        border: 1px solid #E1EAF7;
+        border-radius: 11px;
+        color: #354258;
+        background-color: #FFFFFF;
+        font-size: .91rem;
+        box-shadow: none;
+    }
+
+    .study-form .form-control:focus,
+    .study-form .form-select:focus {
+        border-color: #667EEA;
+        box-shadow: 0 0 0 3px rgba(102,126,234,.12);
+    }
+
+    .study-form .mb-3 {
+        margin-bottom: 15px !important;
+    }
+
+    .study-range-value {
+        color: #526DDA;
+        font-weight: 800;
+    }
+
+    .study-range {
+        width: 100%;
+        accent-color: #667EEA;
+        cursor: pointer;
+    }
+
+    .study-duration-help {
+        display: block;
+        margin-top: 7px;
+        color: #7B8498;
+        font-size: .76rem;
+        line-height: 1.5;
+    }
+
+    .study-submit {
+        width: 100%;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        border: 0;
+        border-radius: 999px;
+        color: #FFFFFF;
+        background: linear-gradient(135deg, #667EEA, #764BA2);
+        font-size: .9rem;
+        font-weight: 800;
+        transition: transform .2s ease, box-shadow .2s ease;
+        box-shadow: 0 8px 18px rgba(102,126,234,.20);
+    }
+
+    .study-submit:hover {
+        color: #FFFFFF;
+        background: linear-gradient(135deg, #596FE0, #68408F);
+        transform: translateY(-1px);
+        box-shadow: 0 11px 22px rgba(102,126,234,.25);
+    }
+
+    /* Learning progress */
+    .study-progress-score {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 13px;
+    }
+
+    .study-progress-score strong {
+        color: #30394B;
+        font-size: .95rem;
+    }
+
+    .study-progress-score span {
+        color: #526DDA;
+        font-weight: 800;
+        font-size: 1.05rem;
+    }
+
+    .study-progress-track {
+        height: 9px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #EAF0FA;
+    }
+
+    .study-progress-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(135deg, #667EEA, #764BA2);
+        transition: width .3s ease;
+    }
+
+    .study-progress-note {
+        color: #717D92;
+        margin: 10px 0 0;
+        font-size: .82rem;
+        line-height: 1.65;
+    }
+
+    /* Study logs table */
+    .study-table-wrap {
+        overflow-x: auto;
+    }
+
+    .study-table {
+        width: 100%;
+        margin: 0;
+        border-collapse: collapse;
+        white-space: nowrap;
+    }
+
+    .study-table thead th {
+        padding: 13px 15px;
+        background: #FFFFFF;
+        color: #77849A;
+        border-bottom: 1px solid #E4EAF4;
+        text-align: left;
+        font-size: .72rem;
+        font-weight: 800;
+        letter-spacing: .045em;
+        text-transform: uppercase;
+    }
+
+    .study-table tbody td {
+        padding: 13px 15px;
+        color: #354258;
+        border-bottom: 1px solid #E7ECF5;
+        font-size: .85rem;
+        vertical-align: middle;
+    }
+
+    .study-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .study-table tbody tr:hover {
+        background: #F5F7FC;
+    }
+
+    .study-subject-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 9px;
+        border-radius: 8px;
+        color: #4256A0;
+        background: #ECF0FF;
+        font-size: .75rem;
+        font-weight: 800;
+    }
+
+    .study-hours-text {
+        color: #344C7E !important;
+        font-weight: 800;
+    }
+
+    .study-productivity {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #526DDA;
+        font-size: .8rem;
+        font-weight: 800;
+    }
+
+    .study-action-btn {
+        display: inline-grid;
+        place-items: center;
+        width: 31px;
+        height: 31px;
+        border: 1px solid #6B83FF;
+        border-radius: 8px;
+        color: #5D78F0;
+        background: #FFFFFF;
+        cursor: pointer;
+        transition: background .2s ease, color .2s ease;
+    }
+
+    .study-action-btn:hover {
+        color: #FFFFFF;
+        background: #667EEA;
+    }
+
+    .study-delete-btn {
+        color: #F04452;
+        border-color: #FF6570;
+    }
+
+    .study-delete-btn:hover {
+        color: #FFFFFF;
+        background: #F04452;
+    }
+
+    /* Empty state */
+    .study-empty {
+        padding: 28px 18px;
+        text-align: center;
+        color: #818BA0;
+    }
+
+    .study-empty-icon {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 10px;
+        border-radius: 13px;
+        background: #EEF2FF;
+        color: #667EEA;
+        font-size: 1.15rem;
+    }
+
+    .study-empty strong {
+        display: block;
+        color: #59657A;
+        font-size: .9rem;
+        margin-bottom: 4px;
+    }
+
+    .study-empty p {
+        margin: 0;
+        font-size: .82rem;
+        line-height: 1.65;
+    }
+
+    /* Charts */
+    .study-chart-body {
+        min-height: 180px;
+        padding: 20px;
+    }
+
+    .study-chart-area {
+        position: relative;
+        width: 100%;
+        height: 235px;
+    }
+
+    .study-chart-area canvas {
+        max-width: 100%;
+        max-height: 235px;
+    }
+
+    .study-chart-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .study-chart-grid .study-chart-area {
+        height: 220px;
+    }
+
+    .study-chart-grid .study-chart-area canvas {
+        max-height: 220px;
+    }
+
+    /* Responsive layout */
+    @media (max-width: 1050px) {
+        .study-metrics {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .study-main-grid {
+            grid-template-columns: minmax(250px, .8fr) minmax(0, 1.2fr);
+        }
+    }
+
+    @media (max-width: 760px) {
+        .study-page {
+            padding: 18px 11px 38px;
+        }
+
+        .study-main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .study-heading-row {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .study-chart-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 440px) {
+        .study-metrics {
+            gap: 9px;
+        }
+
+        .study-metric {
+            padding: 14px;
+            min-height: 104px;
+            border-radius: 14px;
+        }
+
+        .study-metric-top {
+            font-size: .75rem;
+        }
+
+        .study-metric-value {
+            font-size: 1.35rem;
+        }
+
+        .study-card-header {
+            padding: 14px;
+        }
+
+        .study-card-body {
+            padding: 15px;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<main class="study-page">
+    <div class="study-wrap">
+
+        <!-- PAGE HEADING -->
+        <div class="study-heading-row">
+            <h1 class="study-title">
+                <span class="study-title-icon">
+                    <i class="fas fa-book-open"></i>
+                </span>
+                Study Management
+            </h1>
+
+            <div class="study-updated">
+                <i class="far fa-calendar-alt me-1"></i>
+                Track your study sessions and learning progress
+            </div>
+        </div>
+
+
+        <!-- SUMMARY CARDS -->
+        <section class="study-metrics" aria-label="Study summary">
+
+            <div class="study-metric">
+                <div class="study-metric-top">
+                    <span>Total Study Hours</span>
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="study-metric-value">
+                    {{ total_hours|round(1) }} h
+                </div>
+                <small>All recorded sessions</small>
+            </div>
+
+            <div class="study-metric">
+                <div class="study-metric-top">
+                    <span>Average Productivity</span>
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="study-metric-value">
+                    {{ avg_productivity|round(1) }}%
+                </div>
+                <small>Based on recorded study logs</small>
+            </div>
+
+            <div class="study-metric">
+                <div class="study-metric-top">
+                    <span>Study Streak</span>
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div class="study-metric-value">
+                    {{ study_streak }} days
+                </div>
+                <small>Consecutive days up to today</small>
+            </div>
+
+            <div class="study-metric">
+                <div class="study-metric-top">
+                    <span>GPA Estimate</span>
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="study-metric-value">
+                    {{ gpa.gpa }}
+                </div>
+                <small>Estimate from recorded activity</small>
+            </div>
+
+        </section>
+
+
+        <!-- MAIN CONTENT -->
+        <div class="study-main-grid">
+
+            <!-- LEFT COLUMN -->
+            <div class="study-left-column">
+
+                <!-- ADD STUDY SESSION -->
+                <section class="study-card">
+
+                    <div class="study-card-header">
+                        <h2 class="study-card-title">
+                            <i class="fas fa-plus-circle"></i>
+                            Add Study Session
+                        </h2>
+                    </div>
+
+                    <div class="study-card-body">
+                        <form class="study-form" id="addStudyForm"
+                              method="POST"
+                              action="{{ url_for('user_study') }}">
+
+                            <div class="mb-3">
+                                <label class="form-label" for="studyDate">
+                                    Date
+                                </label>
+
+                                <input type="date"
+                                       class="form-control"
+                                       id="studyDate"
+                                       name="date"
+                                       value="{{ datetime.now().strftime('%Y-%m-%d') }}"
+                                       required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="studySubject">
+                                    Subject
+                                </label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       id="studySubject"
+                                       name="subject"
+                                       placeholder="e.g. Python, Machine Learning"
+                                       maxlength="100"
+                                       required>
+                            </div>
+
+                            <!-- HOURS AND MINUTES -->
+                            <div class="mb-3">
+                                <label class="form-label">Study Duration</label>
+
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="form-label"
+                                               for="studyDurationHours">
+                                            Hours
+                                        </label>
+
+                                        <input type="number"
+                                               class="form-control"
+                                               id="studyDurationHours"
+                                               min="0"
+                                               max="23"
+                                               step="1"
+                                               value="0"
+                                               required>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <label class="form-label"
+                                               for="studyDurationMinutes">
+                                            Minutes
+                                        </label>
+
+                                        <input type="number"
+                                               class="form-control"
+                                               id="studyDurationMinutes"
+                                               min="0"
+                                               max="59"
+                                               step="1"
+                                               value="0"
+                                               required>
+                                    </div>
+                                </div>
+
+                                <!-- Backend receives decimal hours -->
+                                <input type="hidden"
+                                       name="hours"
+                                       id="studyHoursTotal"
+                                       value="0.00">
+
+                                <small class="study-duration-help">
+                                    Example: 1 hour and 30 minutes = 1.50 hours.
+                                </small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label"
+                                       for="studyProductivity">
+                                    Productivity Score:
+                                    <span class="study-range-value"
+                                          id="productivityValue">70%</span>
+                                </label>
+
+                                <input type="range"
+                                       class="study-range"
+                                       id="studyProductivity"
+                                       name="productivity"
+                                       min="0"
+                                       max="100"
+                                       value="70"
+                                       step="1"
+                                       required>
+
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">0%</small>
+                                    <small class="text-muted">100%</small>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="study-submit">
+                                <i class="fas fa-save"></i>
+                                Save Study Session
+                            </button>
+
+                        </form>
+                    </div>
+                </section>
+
+
+                <!-- LEARNING OVERVIEW -->
+                <section class="study-card">
+
+                    <div class="study-card-header">
+                        <h2 class="study-card-title">
+                            <i class="fas fa-graduation-cap"></i>
+                            Learning Overview
+                        </h2>
+                    </div>
+
+                    <div class="study-card-body">
+
+                        <div class="study-progress-score">
+                            <strong>Average Productivity</strong>
+                            <span>{{ avg_productivity|round(1) }}%</span>
+                        </div>
+
+                        <div class="study-progress-track">
+                            <div class="study-progress-fill"
+                                 style="width: {{ [[avg_productivity, 100]|min, 0]|max }}%;">
+                            </div>
+                        </div>
+
+                        <p class="study-progress-note">
+                            {% if avg_productivity >= 80 %}
+                                Excellent focus! Keep following your study routine.
+                            {% elif avg_productivity >= 60 %}
+                                Good progress. Try to maintain a consistent study schedule.
+                            {% elif logs %}
+                                Consider shorter study sessions and fewer distractions.
+                            {% else %}
+                                Record your first study session to start tracking productivity.
+                            {% endif %}
+                        </p>
+
+                        <hr style="border-color:#E6EBF5; margin:18px 0;">
+
+                        <div class="study-progress-score">
+                            <strong>Estimated GPA</strong>
+                            <span>{{ gpa.gpa }}</span>
+                        </div>
+
+                        <p class="study-progress-note">
+                            {{ gpa.recommendation }}
+                        </p>
+
+                    </div>
+                </section>
+
+            </div>
+
+
+            <!-- RIGHT COLUMN -->
+            <div class="study-right-column">
+
+                <!-- RECENT STUDY SESSIONS -->
+                <section class="study-card">
+
+                    <div class="study-card-header">
+                        <h2 class="study-card-title">
+                            <i class="fas fa-list-ul"></i>
+                            Recent Study Sessions
+                        </h2>
+
+                        <span class="study-count">
+                            {{ logs|length }} entries
+                        </span>
+                    </div>
+
+                    {% if logs %}
+
+                    <div class="study-table-wrap">
+                        <table class="study-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Subject</th>
+                                    <th>Duration</th>
+                                    <th>Productivity</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for log in logs %}
+                                {% set duration_minutes = (log.hours * 60)|round(0)|int %}
+
+                                <tr>
+                                    <td>{{ log.date.strftime('%d-%m-%Y') }}</td>
+
+                                    <td>
+                                        <span class="study-subject-badge">
+                                            {{ log.subject or 'General study' }}
+                                        </span>
+                                    </td>
+
+                                    <td class="study-hours-text">
+                                        {{ duration_minutes // 60 }} h
+                                        {{ duration_minutes % 60 }} min
+                                    </td>
+
+                                    <td>
+                                        <span class="study-productivity">
+                                            <i class="fas fa-bullseye"></i>
+                                            {{ log.productivity_score }}%
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <button type="button"
+                                                class="study-action-btn me-1"
+                                                title="Edit study session"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editStudyModal"
+                                                data-id="{{ log.id }}"
+                                                data-date="{{ log.date.strftime('%Y-%m-%d') }}"
+                                                data-subject="{{ log.subject or '' }}"
+                                                data-hours="{{ log.hours }}"
+                                                data-productivity="{{ log.productivity_score }}">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+
+                                        <form method="POST"
+                                              action="{{ url_for('delete_study_log', id=log.id) }}"
+                                              style="display:inline;"
+                                              onsubmit="return confirm('Delete this study session?');">
+
+                                            <button type="submit"
+                                                    class="study-action-btn study-delete-btn"
+                                                    title="Delete study session">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% else %}
+
+                    <div class="study-empty">
+                        <div class="study-empty-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+
+                        <strong>No study sessions recorded yet</strong>
+
+                        <p>
+                            Add your first study session to see your
+                            learning activity here.
+                        </p>
+                    </div>
+
+                    {% endif %}
+                </section>
+
+
+                <!-- STUDY HOURS TREND -->
+                <section class="study-card">
+
+                    <div class="study-card-header">
+                        <h2 class="study-card-title">
+                            <i class="fas fa-chart-line"></i>
+                            Study Hours Trend
+                        </h2>
+                    </div>
+
+                    <div class="study-chart-body">
+
+                        {% if study_dates %}
+                        <div class="study-chart-area">
+                            <canvas id="studyHoursChart"></canvas>
+                        </div>
+                        {% else %}
+                        <div class="study-empty">
+                            <div class="study-empty-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <strong>Your study trend will appear here</strong>
+                            <p>Record study sessions to build your chart.</p>
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </section>
+
+
+                <!-- SUBJECT AND PRODUCTIVITY CHARTS -->
+                <div class="study-chart-grid">
+
+                    <section class="study-card">
+                        <div class="study-card-header">
+                            <h2 class="study-card-title">
+                                <i class="fas fa-chart-pie"></i>
+                                Subject Breakdown
+                            </h2>
+                        </div>
+
+                        <div class="study-chart-body">
+                            {% if subjects %}
+                            <div class="study-chart-area">
+                                <canvas id="subjectHoursChart"></canvas>
+                            </div>
+                            {% else %}
+                            <div class="study-empty">
+                                <div class="study-empty-icon">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <strong>No subject data</strong>
+                                <p>Add sessions by subject to view the breakdown.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </section>
+
+
+                    <section class="study-card">
+                        <div class="study-card-header">
+                            <h2 class="study-card-title">
+                                <i class="fas fa-bullseye"></i>
+                                Productivity Trend
+                            </h2>
+                        </div>
+
+                        <div class="study-chart-body">
+                            {% if prod_dates %}
+                            <div class="study-chart-area">
+                                <canvas id="productivityChart"></canvas>
+                            </div>
+                            {% else %}
+                            <div class="study-empty">
+                                <div class="study-empty-icon">
+                                    <i class="fas fa-bullseye"></i>
+                                </div>
+                                <strong>No productivity data</strong>
+                                <p>Log sessions to track your focus over time.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </section>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<!-- EDIT STUDY SESSION MODAL -->
+<div class="modal fade"
+     id="editStudyModal"
+     tabindex="-1"
+     aria-labelledby="editStudyModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content"
+             style="border:0; border-radius:20px; overflow:hidden;">
+
+            <form method="POST"
+                  action="{{ url_for('edit_study_log') }}"
+                  id="editStudyForm">
+
+                <div class="modal-header"
+                     style="background:#F4F6FD; border-bottom:1px solid #E3EAF6;">
+
+                    <h5 class="modal-title fw-bold"
+                        id="editStudyModalLabel"
+                        style="color:#30394B;">
+                        <i class="fas fa-pen me-2"
+                           style="color:#2878E8;"></i>
+                        Edit Study Session
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-4">
+
+                    <input type="hidden" name="id" id="editStudyId">
+                    <input type="hidden"
+                           name="hours"
+                           id="editStudyHoursTotal"
+                           value="0.00">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold"
+                               for="editStudyDate">Date</label>
+
+                        <input type="date"
+                               class="form-control"
+                               name="date"
+                               id="editStudyDate"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold"
+                               for="editStudySubject">Subject</label>
+
+                        <input type="text"
+                               class="form-control"
+                               name="subject"
+                               id="editStudySubject"
+                               maxlength="100"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Study Duration
+                        </label>
+
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label"
+                                       for="editStudyDurationHours">Hours</label>
+
+                                <input type="number"
+                                       class="form-control"
+                                       id="editStudyDurationHours"
+                                       min="0"
+                                       max="23"
+                                       step="1"
+                                       value="0"
+                                       required>
+                            </div>
+
+                            <div class="col-6">
+                                <label class="form-label"
+                                       for="editStudyDurationMinutes">Minutes</label>
+
+                                <input type="number"
+                                       class="form-control"
+                                       id="editStudyDurationMinutes"
+                                       min="0"
+                                       max="59"
+                                       step="1"
+                                       value="0"
+                                       required>
+                            </div>
+                        </div>
+
+                        <small class="study-duration-help">
+                            Enter hours and minutes separately.
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold"
+                               for="editStudyProductivity">
+                            Productivity (%)
+                        </label>
+
+                        <input type="number"
+                               class="form-control"
+                               name="productivity"
+                               id="editStudyProductivity"
+                               min="0"
+                               max="100"
+                               step="1"
+                               required>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer"
+                     style="border-top:1px solid #E3EAF6;">
+
+                    <button type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn text-white"
+                            style="background:linear-gradient(135deg,#667EEA,#764BA2); border:0; border-radius:10px;">
+                        <i class="fas fa-save me-1"></i>
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* Convert hours and minutes to decimal hours for Flask */
+    const durationHours = document.getElementById('studyDurationHours');
+    const durationMinutes = document.getElementById('studyDurationMinutes');
+    const totalStudyHours = document.getElementById('studyHoursTotal');
+    const addStudyForm = document.getElementById('addStudyForm');
+
+    function updateStudyDuration() {
+        const hours = Number(durationHours.value || 0);
+        const minutes = Number(durationMinutes.value || 0);
+
+        totalStudyHours.value =
+            ((hours * 60 + minutes) / 60).toFixed(2);
+    }
+
+    durationHours.addEventListener('input', updateStudyDuration);
+    durationMinutes.addEventListener('input', updateStudyDuration);
+
+    addStudyForm.addEventListener('submit', function (event) {
+        const hours = Number(durationHours.value || 0);
+        const minutes = Number(durationMinutes.value || 0);
+
+        if (!Number.isInteger(hours) || !Number.isInteger(minutes) ||
+            hours < 0 || hours > 23 ||
+            minutes < 0 || minutes > 59 ||
+            hours * 60 + minutes <= 0) {
+
+            event.preventDefault();
+
+            alert(
+                'Enter a valid study duration greater than zero. ' +
+                'Minutes must be between 0 and 59.'
+            );
+
+            return;
+        }
+
+        updateStudyDuration();
+    });
+
+    updateStudyDuration();
+
+
+    /* Productivity slider */
+    const productivityInput = document.getElementById('studyProductivity');
+    const productivityValue = document.getElementById('productivityValue');
+
+    if (productivityInput && productivityValue) {
+        productivityInput.addEventListener('input', function () {
+            productivityValue.textContent = this.value + '%';
+        });
+    }
+
+
+    /* Edit study-session modal */
+    const editModal = document.getElementById('editStudyModal');
+    const editHours = document.getElementById('editStudyDurationHours');
+    const editMinutes = document.getElementById('editStudyDurationMinutes');
+    const editTotalHours = document.getElementById('editStudyHoursTotal');
+    const editForm = document.getElementById('editStudyForm');
+
+    function updateEditedDuration() {
+        const hours = Number(editHours.value || 0);
+        const minutes = Number(editMinutes.value || 0);
+
+        editTotalHours.value =
+            ((hours * 60 + minutes) / 60).toFixed(2);
+    }
+
+    if (editModal) {
+        editModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+
+            if (!button) return;
+
+            document.getElementById('editStudyId').value =
+                button.getAttribute('data-id');
+
+            document.getElementById('editStudyDate').value =
+                button.getAttribute('data-date');
+
+            document.getElementById('editStudySubject').value =
+                button.getAttribute('data-subject');
+
+            document.getElementById('editStudyProductivity').value =
+                button.getAttribute('data-productivity');
+
+            const totalMinutes = Math.round(
+                parseFloat(button.getAttribute('data-hours') || '0') * 60
+            );
+
+            editHours.value = Math.floor(totalMinutes / 60);
+            editMinutes.value = totalMinutes % 60;
+
+            updateEditedDuration();
+        });
+    }
+
+    editHours.addEventListener('input', updateEditedDuration);
+    editMinutes.addEventListener('input', updateEditedDuration);
+
+    editForm.addEventListener('submit', function (event) {
+        const hours = Number(editHours.value || 0);
+        const minutes = Number(editMinutes.value || 0);
+
+        if (!Number.isInteger(hours) || !Number.isInteger(minutes) ||
+            hours < 0 || hours > 23 ||
+            minutes < 0 || minutes > 59 ||
+            hours * 60 + minutes <= 0) {
+
+            event.preventDefault();
+
+            alert(
+                'Enter a valid study duration greater than zero. ' +
+                'Minutes must be between 0 and 59.'
+            );
+
+            return;
+        }
+
+        updateEditedDuration();
+    });
+
+
+    /* Chart theme */
+    if (typeof Chart === 'undefined') return;
+
+    const chartBlue = '#667EEA';
+    const chartPurple = '#764BA2';
+    const chartFill = 'rgba(102, 126, 234, 0.12)';
+    const chartMuted = '#77849A';
+    const chartGrid = '#E5EAF4';
+
+
+    /* Study hours trend */
+    const studyCanvas = document.getElementById('studyHoursChart');
+
+    if (studyCanvas) {
+        const studyDates = {{ study_dates|tojson }};
+        const studyHours = {{ study_hours|tojson }};
+
+        new Chart(studyCanvas, {
+            type: 'line',
+
+            data: {
+                labels: studyDates,
+
+                datasets: [{
+                    label: 'Study Hours',
+                    data: studyHours,
+                    borderColor: chartBlue,
+                    backgroundColor: chartFill,
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointBackgroundColor: chartBlue
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: chartMuted,
+                            usePointStyle: true
+                        }
+                    }
+                },
+
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: chartMuted,
+                            maxRotation: 45
+                        }
+                    },
+
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: chartGrid },
+                        ticks: { color: chartMuted }
+                    }
+                }
+            }
+        });
+    }
+
+
+    /* Subject breakdown */
+    const subjectCanvas = document.getElementById('subjectHoursChart');
+
+    if (subjectCanvas) {
+        const subjectLabels = {{ subjects|tojson }};
+        const subjectValues = {{ subject_hours|tojson }};
+
+        const palette = [
+            '#667EEA',
+            '#764BA2',
+            '#4398DF',
+            '#43B87D',
+            '#E85BA8',
+            '#A49BE0',
+            '#5B79C7',
+            '#D63384'
+        ];
+
+        new Chart(subjectCanvas, {
+            type: 'doughnut',
+
+            data: {
+                labels: subjectLabels,
+
+                datasets: [{
+                    data: subjectValues,
+
+                    backgroundColor: subjectLabels.map(
+                        (_, index) => palette[index % palette.length]
+                    ),
+
+                    borderColor: '#FFFFFF',
+                    borderWidth: 3,
+                    hoverOffset: 5
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+
+                        labels: {
+                            color: chartMuted,
+                            padding: 12,
+                            usePointStyle: true,
+                            boxWidth: 9
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+
+    /* Productivity trend */
+    const productivityCanvas =
+        document.getElementById('productivityChart');
+
+    if (productivityCanvas) {
+        const productivityDates = {{ prod_dates|tojson }};
+        const productivityScores = {{ prod_avg|tojson }};
+
+        new Chart(productivityCanvas, {
+            type: 'line',
+
+            data: {
+                labels: productivityDates,
+
+                datasets: [{
+                    label: 'Productivity (%)',
+                    data: productivityScores,
+                    borderColor: chartPurple,
+                    backgroundColor: 'rgba(118,75,162,.12)',
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 3,
+                    pointRadius: 3,
+                    pointBackgroundColor: chartPurple
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: { display: false }
+                },
+
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: chartMuted,
+                            maxRotation: 45
+                        }
+                    },
+
+                    y: {
+                        min: 0,
+                        max: 100,
+                        grid: { color: chartGrid },
+
+                        ticks: {
+                            color: chartMuted,
+                            callback: value => value + '%'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+});
+</script>
+{% endblock %}

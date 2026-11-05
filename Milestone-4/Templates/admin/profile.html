@@ -1,0 +1,262 @@
+
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+
+.profile-wrapper {
+    background: linear-gradient(135deg, #f0f4ff, #f8f0ff);
+    padding: 25px 20px;
+    border-radius: 20px;
+    min-height: 75vh;
+    max-width: 1250px;
+    margin: 0 auto;
+}
+
+.profile-card,
+.info-card {
+    background: rgba(255,255,255,0.9);
+    border-radius: 20px;
+    padding: 22px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    height: 100%;
+}
+
+.profile-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.7rem;
+    font-weight: bold;
+    margin: 0 auto 15px;
+}
+
+.profile-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.admin-label {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 6px 15px;
+    border-radius: 25px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.profile-action {
+    display: block;
+    width: 100%;
+    padding: 9px;
+    border-radius: 25px;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.info-card h4 {
+    font-size: 1.35rem;
+    margin-bottom: 18px !important;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #edf0f5;
+    gap: 15px;
+    font-size: 14px;
+}
+
+.info-label {
+    color: #718096;
+}
+
+.info-value {
+    font-weight: 600;
+    color: #2d3748;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.stat-box {
+    text-align: center;
+    padding: 15px 5px;
+}
+
+.stat-box i {
+    font-size: 23px;
+    margin-bottom: 8px;
+}
+
+.stat-box h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.stat-box small {
+    color: #718096;
+    text-transform: uppercase;
+    font-size: 11px;
+}
+
+@media(max-width: 767px) {
+    .profile-wrapper {
+        padding: 15px 10px;
+    }
+
+    .profile-card,
+    .info-card {
+        padding: 18px;
+    }
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid profile-wrapper">
+
+    <div class="row g-4 justify-content-center">
+
+        <!-- LEFT PROFILE CARD -->
+        <div class="col-lg-4 col-md-5">
+            <div class="profile-card text-center">
+
+                <div class="profile-avatar">
+                    {{ user.username[0]|upper }}
+                </div>
+
+                <h3 class="fw-bold">{{ user.username }}</h3>
+
+                <span class="admin-label">
+                    <i class="fas fa-shield-alt"></i>
+                    ADMINISTRATOR
+                </span>
+
+               <a href="{{ url_for('admin_edit_profile') }}"
+                   class="btn btn-primary profile-action">
+                    <i class="fas fa-user-edit me-2"></i>
+                    Edit Profile
+                </a>
+
+                <a href="{{ url_for('logout') }}"
+                   class="btn btn-outline-danger profile-action">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    Logout
+                </a>
+
+            </div>
+        </div>
+
+        <!-- RIGHT ACCOUNT INFORMATION -->
+        <div class="col-lg-7 col-md-7">
+            <div class="info-card">
+
+                <h4 class="fw-bold mb-4">
+                    <i class="fas fa-id-card text-primary me-2"></i>
+                    Account Information
+                </h4>
+
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-hashtag text-primary me-2"></i>
+                        User ID
+                    </span>
+                    <span class="info-value">{{ user.id }}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-user text-primary me-2"></i>
+                        Username
+                    </span>
+                    <span class="info-value">{{ user.username }}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-envelope text-primary me-2"></i>
+                        Email
+                    </span>
+                    <span class="info-value">{{ user.email }}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-birthday-cake text-primary me-2"></i>
+                        Age
+                    </span>
+                    <span class="info-value">
+                        {{ user.age if user.age else 'Not provided' }}
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-briefcase text-primary me-2"></i>
+                        Occupation
+                    </span>
+                    <span class="info-value">
+                        {{ user.occupation or 'Not provided' }}
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-piggy-bank text-primary me-2"></i>
+                        Savings
+                    </span>
+                    <span class="info-value">
+                        ₹{{ "%.2f"|format(user.savings or 0) }}
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-calendar text-primary me-2"></i>
+                        Member Since
+                    </span>
+                    <span class="info-value">
+                        {{ user.created_at.strftime('%b %d, %Y') if user.created_at else 'N/A' }}
+                    </span>
+                </div>
+
+                <!-- ACCOUNT STATISTICS -->
+                <div class="row mt-4">
+
+                    <div class="col-4 stat-box">
+                        <i class="fas fa-users text-primary"></i>
+                        <h3>{{ total_users }}</h3>
+                        <small>Users</small>
+                    </div>
+
+                    <div class="col-4 stat-box">
+                        <i class="fas fa-exchange-alt text-success"></i>
+                        <h3>{{ total_transactions }}</h3>
+                        <small>Transactions</small>
+                    </div>
+
+                    <div class="col-4 stat-box">
+                        <i class="fas fa-flag text-warning"></i>
+                        <h3>{{ total_goals }}</h3>
+                        <small>Goals</small>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
